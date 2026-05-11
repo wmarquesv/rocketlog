@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { prisma } from "@/database/prisma";
 import { z } from "zod";
 import { hash } from "bcrypt";
 
@@ -12,9 +13,25 @@ class UsersController {
 
     const { name, email, password } = bodySchema.parse(request.body);
 
+    const userWithSameEmail = await prisma.user.findFirst({ where: { email } });
+
+    if (userWithSameEmail) {
+      throw new Error("Usuário com esse email já existe");
+    }
+
     const hashedPassword = await hash(password, 8);
 
-    return response.json({ message: "ok", hashedPassword });
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    const { password: _, ...UserWithoutPassword } = user;
+
+    return response.json(UserWithoutPassword);
   }
 }
 
