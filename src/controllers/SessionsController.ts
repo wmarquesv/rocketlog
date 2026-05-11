@@ -1,4 +1,4 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { AppError } from "@/utils/appError";
 import { authConfig } from "@/configs/auth";
 import { prisma } from "@/database/prisma";
