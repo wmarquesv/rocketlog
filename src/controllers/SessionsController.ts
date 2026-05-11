@@ -1,7 +1,9 @@
-import { AppError } from "@/utils/appError";
 import { Request, response, Response } from "express";
+import { AppError } from "@/utils/appError";
+import { authConfig } from "@/configs/auth";
 import { prisma } from "@/database/prisma";
 import { z } from "zod";
+import { sign } from "jsonwebtoken";
 import { compare } from "bcrypt";
 
 class SessionsController {
@@ -25,7 +27,16 @@ class SessionsController {
       throw new AppError("Email ou senha incorretos", 401);
     }
 
-    return response.json({ message: "ok" });
+    const { secret, expiresIN } = authConfig.jwt;
+
+    const token = sign({ role: user.role ?? "customer" }, secret, {
+      subject: user.id,
+      expiresIn: expiresIN,
+    });
+
+    const { password: hashedPassword, ...userWithoutPassword } = user;
+
+    return response.json({ token, user: userWithoutPassword });
   }
 }
 
