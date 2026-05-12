@@ -42,7 +42,7 @@ model Delivery {
   status DeliveryStatus @default(processing)
   
   user User @relation(fields: [userId], references: [id])
-  Logs DeliveryLog[]
+  logs DeliveryLog[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
