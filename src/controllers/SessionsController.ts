@@ -3,7 +3,7 @@ import { AppError } from "@/utils/appError";
 import { authConfig } from "@/configs/auth";
 import { prisma } from "@/database/prisma";
 import { z } from "zod";
-import { sign } from "jsonwebtoken";
+import { sign, SignOptions } from "jsonwebtoken";
 import { compare } from "bcrypt";
 
 class SessionsController {
@@ -27,11 +27,11 @@ class SessionsController {
       throw new AppError("Email ou senha incorretos", 401);
     }
 
-    const { secret, expiresIN } = authConfig.jwt;
+    const { secret } = authConfig.jwt;
 
     const token = sign({ role: user.role ?? "customer" }, secret, {
       subject: user.id,
-      expiresIn: expiresIN,
+      expiresIn: "1d",
     });
 
     const { password: hashedPassword, ...userWithoutPassword } = user;
